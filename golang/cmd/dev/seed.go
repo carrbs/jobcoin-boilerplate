@@ -17,10 +17,8 @@ func main() {
 
 	for {
 		//TODO: change to use local db package
-		// db, err = sqlx.Connect("mysql", "root@/?timeout=30s&readTimeout=30s&writeTimeout=30s&multiStatements=true&charset=utf8mb4")
 		db, err = sqlx.Connect("mysql", "root@/")
 		if err != nil {
-			fmt.Println("err: ", err)
 			fmt.Println("waiting for mysql...")
 			time.Sleep(time.Second)
 			continue
@@ -42,6 +40,16 @@ var deposit_addresses = `CREATE TABLE jobcoin_mixer.deposit_addresses (
 	UNIQUE KEY deposit_address_child(deposit_address, child)
 );`
 
+var mixes = `CREATE TABLE jobcoin_mixer.mixes (
+	id int(11) AUTO_INCREMENT PRIMARY KEY,
+	amount varchar(255),
+	child varchar(255),
+	status varchar(255),
+	created_at datetime NOT NULL,
+	updated_at datetime NOT NULL
+);`
+
+// TODO: this is unused, remove or refactor code / schema to reference
 var add = `CREATE TABLE jobcoin_mixer.addresses (
 	id int(11) AUTO_INCREMENT PRIMARY KEY,
 	address varchar(255)
