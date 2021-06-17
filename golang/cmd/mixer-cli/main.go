@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/gemini/jobcoin/clientlib"
-	"github.com/gemini/jobcoin/db"
 	"github.com/gemini/jobcoin/mixerlib"
+	"github.com/gemini/jobcoin/models/addresses"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
@@ -39,7 +39,7 @@ where your mixed Jobcoins will be sent. Example:
 }
 
 func main() {
-	addresses := inputDepositAddresses()
+	addrs := inputDepositAddresses()
 	depositAddress, err := uuid.NewUUID()
 	if err != nil {
 		log.Fatal(err)
@@ -47,26 +47,13 @@ func main() {
 	fmt.Printf(`
 You may now send Jobcoins to address %s.
 
-They will be mixed into %s and sent to your destination addresses.`, depositAddress, addresses)
-	AddNewDepositAddress(depositAddress, addresses)
+They will be mixed into %s and sent to your destination addresses.`, depositAddress, addrs)
+	addresses.AddNewDepositAddress(depositAddress, addrs)
 	response, err := clientlib.HTTPClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(response)
 
-	mixerlib.Mixer(addresses)
-}
-
-func AddNewDepositAddress(depositAddress uuid.UUID, addresses []string) error {
-	conn := db.DBConn()
-	defer conn.Close()
-	for _, child := range addresses {
-		fmt.Println("deposit_address, child", depositAddress.String(), child)
-		_, err := conn.Exec("INSERT INTO deposit_addresses(deposit_address, child) values (?,?)", depositAddress.String(), child)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	mixerlib.Mixer(addrs)
 }
