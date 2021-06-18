@@ -4,8 +4,8 @@
 This project is a working implementation of a Jobcoin mixer. It is not complete, does not include tests and does not exemplify what the final best version is. But, it works pretty well, covers the base cases, and I had a bunch of fun making it!
 
 - I have left some "`TODO:...`" comments in the code intentionally to point out areas that I would revisit given more time.
-- aThe remainder of the document outlines what I have added to the boilerplate in order to meet the minimum requirements.
-- There is a breif section on usage, with instructions for how you can run this program locally, (on a mac).
+- The remainder of the document outlines what I have added to the boilerplate in order to meet the minimum requirements.
+- There is a brief section on usage, with instructions for how you can run this program locally, (on a mac).
 - Finally a brief discussion on what I'd change given more time.
 
 ## Poller
@@ -19,11 +19,11 @@ The db package holds was designed to hold files relevant to db interaction. Movi
 ## Server
 I have added an HTTP server, that listens at port `:1337` on localhost. The server has two main functions:
 - listen for `POST /create` requests
-- instantiate and keep alive the `poller` package
+- instantiate and keep alive the `poller` package/service
 
 The `POST /create` handler:
 - creates a new Deposit Address that the requester can deposit funds into (much like the `mixer-cli`).
-- stores a list of new "child" addresses (requester identified addresses for deposit) in the `jobcoin_mixer` database and associates them with the newly created Deposit Address
+- stores a list of new "child" addresses (requester identified addresses for deposit) in the `jobcoin_mixer` database and associates them with the newly created Deposit Address.
 - registers the new deposit Address in the `Poller` service.
 - returns the new Deposit Address associated with the new child addresses in the response.
 
