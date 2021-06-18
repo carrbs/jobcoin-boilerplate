@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -52,8 +53,12 @@ func main() {
 type NewAddress struct {
 	Children []*addresses.ChildAddress `json:"deposit_addresses"`
 }
+type DepositAddress struct {
+	Address string `json:"address"`
+}
 
 func CreateDepositAddress(p *poller.DepositAddressPoller) httprouter.Handle {
+	// TODO: change Fatals to correct returns (Bad request/ISE, etc...)
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -70,7 +75,16 @@ func CreateDepositAddress(p *poller.DepositAddressPoller) httprouter.Handle {
 			log.Fatal(err)
 		}
 
-		addresses.AddNewDepositAddress(depositAddress, childAddresses.MustStringArray())
+		if err := addresses.AddNewDepositAddress(depositAddress, childAddresses.MustStringArray()); err != nil {
+			log.Fatal(err)
+
+		}
 		p.AddURL(addresses.NewDepositAddress(depositAddress.String()))
+
+		response := &DepositAddress{Address: depositAddress.String()}
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
